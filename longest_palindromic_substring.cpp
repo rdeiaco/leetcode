@@ -8,87 +8,58 @@ using namespace std;
 class Solution {
 public:
   string longestPalindrome(string s) {
-    vector<bool> is_palindrome_lut(s.size() * s.size());
-    vector<pair<int, int>> max_pair_lut(s.size() * s.size());
-    vector<bool> found_lut(s.size() * s.size());
-    pair<int, int> max_pair = maxPalindrome(s, 0, s.size(), is_palindrome_lut, max_pair_lut, found_lut);
-
-    return s.substr(max_pair.first, max_pair.second-max_pair.first);
-
-  }
-
-  pair<int, int> maxPalindrome(string s, int start, int end, 
-    vector<bool> &is_palindrome_lut, 
-    vector<pair<int, int>> &max_pair_lut,
-    vector<bool> &found_lut) {
-
-    if (end - start < 2) {
-      return pair<int, int>(start, end);
+    if (s.size() == 0) {
+      return "";
     }
 
-    int search_val = start * s.size() + end;
-    if (found_lut[search_val]) {
-      return max_pair_lut[search_val];
-    }
+    bool is_palindrome[s.size()][s.size()] = {0};
 
-    if (isPalindrome(s, start, end, is_palindrome_lut, found_lut)) {
-      pair<int, int> ret_pair(start, end);
-      max_pair_lut[search_val] = ret_pair;
-      return ret_pair;
-    }
+    int max_i = 0;
+    int max_j = 0;
+    int max_len = 0;
 
-    pair<int, int> pair1 = maxPalindrome(s, start + 1, end - 1, is_palindrome_lut, max_pair_lut, found_lut);
-    pair<int, int> pair2 = maxPalindrome(s, start, end - 1, is_palindrome_lut, max_pair_lut, found_lut);
-    pair<int, int> pair3 = maxPalindrome(s, start + 1, end, is_palindrome_lut, max_pair_lut, found_lut);
-    int length1 = pair1.second - pair1.first;
-    int length2 = pair2.second - pair2.first;
-    int length3 = pair3.second - pair3.first;
-
-    if ((length1 > length2) && (length1 > length3)) {
-      max_pair_lut[search_val] = pair1;
-      return pair1;
-    }
-    else if (length2 > length3) {
-      max_pair_lut[search_val] = pair2;
-      return pair2;
-    }
-    else {
-      max_pair_lut[search_val] = pair3;
-      return pair3;
-    }
-
-  }
-
-  bool isPalindrome(string s, int start, int end, 
-    vector<bool> &is_palindrome_lut, vector<bool> &found_lut) {
-    if (end - start < 2) {
-      return true;
-    }
-
-    int search_val = start * s.size() + end;
-    if (found_lut[search_val]) {
-      return is_palindrome_lut[search_val];
-    }
-    
-    if (s[start] == s[end-1]) {
-      if (isPalindrome(s, start + 1, end - 1, is_palindrome_lut, found_lut)) {
-        is_palindrome_lut[search_val] = true;
-        found_lut[search_val] = true;
-        return true;
+    for (int j = 0; j < s.size(); j++) {
+      for (int i = 0; i <= j; i++) {
+        if (j == i) {
+          is_palindrome[i][j] = true;
+          if (j - i + 1 >= max_len) {
+            max_len = j - i + 1;
+            max_i = i;
+            max_j = j;
+          }
+        }
+        else if (j - i == 1) {
+          if (s[i] == s[j]) {
+            is_palindrome[i][j] = true;
+            if (j - i + 1 >= max_len) {
+              max_len = j - i + 1;
+              max_i = i;
+              max_j = j;
+            }
+          }
+        }
+        else {
+          is_palindrome[i][j] = is_palindrome[i+1][j-1] && (s[i] == s[j]);
+          if (is_palindrome[i][j]) {
+            if (j - i + 1 >= max_len) {
+              max_len = j - i + 1;
+              max_i = i;
+              max_j = j;
+            }
+          }
+        }
       }
     }
 
-    is_palindrome_lut[search_val] = false;
-    found_lut[search_val] = true;
-    return false;
+    return s.substr(max_i, max_len);
 
   }
-  
 
 };
 
 int main(void) {
   Solution sol;
+  cout << sol.longestPalindrome("cbbd") << "\n";
   cout << sol.longestPalindrome("babad") << "\n";
   cout << sol.longestPalindrome("jrjnbctoqgzimtoklkxcknwmhiztomaofwwzjnhrijwkgmwwuazcowskjhitejnvtblqyepxispasrgvgzqlvrmvhxusiqqzzibcyhpnruhrgbzsmlsuacwptmzxuewnjzmwxbdzqyvsjzxiecsnkdibudtvthzlizralpaowsbakzconeuwwpsqynaxqmgngzpovauxsqgypinywwtmekzhhlzaeatbzryreuttgwfqmmpeywtvpssznkwhzuqewuqtfuflttjcxrhwexvtxjihunpywerkktbvlsyomkxuwrqqmbmzjbfytdddnkasmdyukawrzrnhdmaefzltddipcrhuchvdcoegamlfifzistnplqabtazunlelslicrkuuhosoyduhootlwsbtxautewkvnvlbtixkmxhngidxecehslqjpcdrtlqswmyghmwlttjecvbueswsixoxmymcepbmuwtzanmvujmalyghzkvtoxynyusbpzpolaplsgrunpfgdbbtvtkahqmmlbxzcfznvhxsiytlsxmmtqiudyjlnbkzvtbqdsknsrknsykqzucevgmmcoanilsyyklpbxqosoquolvytefhvozwtwcrmbnyijbammlzrgalrymyfpysbqpjwzirsfknnyseiujadovngogvptphuyzkrwgjqwdhtvgxnmxuheofplizpxijfytfabx") << "\n";
 
