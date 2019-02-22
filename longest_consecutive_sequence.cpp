@@ -9,6 +9,10 @@ class Solution {
 public:
   int longestConsecutive(vector<int> &nums) {
     unordered_map<int, pair<int, int>> lcs_map;
+    if (nums.size() == 0) {
+      return 0;
+    }
+
     int largest_size = 1;
     for (int num : nums) {
       if (lcs_map.find(num) != lcs_map.end()) {
@@ -26,11 +30,9 @@ public:
           first = lcs_map[num + 1].first + 1;
           second = lcs_map[num - 1].second + 1;
 
-          cout << num << " " << first << " " << second << endl;
-
           int temp = first + second - 1;
-          lcs_map[num - (first - 1)].first = temp;
-          lcs_map[num + (second - 1)].second = temp;
+          lcs_map[num - (second - 1)].first = temp;
+          lcs_map[num + (first - 1)].second = temp;
           if (temp > largest_size) {
             largest_size = temp;
           }
@@ -60,8 +62,7 @@ public:
 
 int main(void) {
   Solution sol;
-  //vector<int> nums = {1, 6, 3, 2, 5, 8, 7, 1, 2, 4, 9};
-  vector<int> nums = {1, 6, 3, 2, 5, 8, 7, 1, 2, 4};//, 9};
+  vector<int> nums = {1, 6, 3, 2, 5, 8, 7, 1, 2, 4, 9};
   cout << sol.longestConsecutive(nums) << endl;
 
 }
